@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: infologik
+    runtime: python
+    buildCommand: echo "Ready"
+    startCommand: python3 server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

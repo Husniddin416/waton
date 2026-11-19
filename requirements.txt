@@ -1,0 +1,2 @@
+# InfoLogik uchun hech qanday tashqi kutubxona kerak emas.
+# Python 3 standart kutubxonasi yetarli.
