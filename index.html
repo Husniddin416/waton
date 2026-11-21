@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InfoLogik — Informatika va Mantiqiy Savollar</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-card {
+      background: var(--bg-base);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text-secondary);
+    }
+    .form-control {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container nav-wrap">
+      <div class="logo" id="site-logo">
+        <div class="logo-badge">⚡</div>
+        <span>Info<span style="color: var(--primary);">Logik</span></span>
+      </div>
+
+      <div class="header-actions">
+        <!-- USER BADGE (Kirgan bo'lsa) -->
+        <div id="header-user-badge" class="user-profile-badge hidden" title="Profilni ko'rish">
+          <div class="user-avatar-circle" id="user-badge-initial">A</div>
+          <span class="user-name-label" id="user-badge-name">Foydalanuvchi</span>
+        </div>
+
+        <!-- AUTH BUTTON (Kirmagan bo'lsa) -->
+        <button class="btn-primary" id="btn-header-auth" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+          👤 Kirish
+        </button>
+
+        <!-- ADMIN PANEL BUTTON (Faqat admin bo'lib kirganda ko'rinadi) -->
+        <button class="btn-secondary hidden" id="btn-header-admin" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+          ⚙️ Admin Panel
+        </button>
+
+        <!-- AUTHOR / TEGISHLI ODAM BUTTON -->
+        <button class="btn-secondary" id="btn-header-author" onclick="scrollToAuthor()" style="padding: 0.5rem 1rem; font-size: 0.9rem;" title="Loyiha muallifi va mas'ul shaxs">
+          👨‍💻 Muallif
+        </button>
+
+        <!-- THEME TOGGLE -->
+        <button class="btn-icon" id="btn-toggle-theme" title="Mavzuni o'zgartirish">
+          <span id="theme-icon">☀️</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="flex: 1;">
+    
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <h1>Informatika & Mantiqiy Savollar</h1>
+      <p>O'z bilimingizni sinang, ballar to'plang va umumiy reytingda peshqadam bo'ling!</p>
+      
+      <div class="stat-pills">
+        <div class="stat-pill">
+          <span>💻 Informatika:</span>
+          <strong id="stat-info-count">0</strong>
+        </div>
+        <div class="stat-pill">
+          <span>🧠 Mantiqiy savollar:</span>
+          <strong id="stat-logic-count">0</strong>
+        </div>
+        <div class="stat-pill">
+          <span>🎯 Bajarilgan testlar:</span>
+          <strong id="stat-played-count">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB SELECTOR -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" data-tab="home">🎯 Viktorina / Testlar</button>
+      <button class="tab-btn" data-tab="riddles">🧩 Mantiqiy Jumboqlar</button>
+      <button class="tab-btn tab-btn-tournament" data-tab="tournament">⚡ Musobaqa</button>
+      <button class="tab-btn" data-tab="leaderboard">🏆 Reyting (Top)</button>
+      <button class="tab-btn hidden" data-tab="admin" id="tab-btn-admin">⚙️ Boshqaruv (Admin)</button>
+    </div>
+
+    <!-- VIEW 1: HOME & TEST CATEGORIES -->
+    <div id="section-home" class="view-section">
+      <div id="home-view">
+        <div class="category-selector">
+          
+          <!-- Card 1: Informatika -->
+          <div class="cat-card" onclick="startQuiz('informatika', 'all')">
+            <div>
+              <div class="cat-icon">💻</div>
+              <h3>Informatika Testlari</h3>
+              <p>Dasturlash (Python, JS, C++), sanoq sistemalari, ma'lumotlar tuzilmalari, algoritmlar va kiberxavfsizlik.</p>
+            </div>
+            <div class="cat-footer">
+              <span>Har bir savol: 10-30 ball</span>
+              <button class="cat-btn">Boshlash ➔</button>
+            </div>
+          </div>
+
+          <!-- Card 2: Mantiq -->
+          <div class="cat-card" onclick="startQuiz('mantiq', 'all')">
+            <div>
+              <div class="cat-icon">🧠</div>
+              <h3>Mantiqiy Savollar</h3>
+              <p>Nostandart fikrlash, matematik ketma-ketliklar, deduksiya, topqirlik va IQ darajadagi mantiqiy testlar.</p>
+            </div>
+            <div class="cat-footer">
+              <span>Har bir savol: 10-30 ball</span>
+              <button class="cat-btn">Boshlash ➔</button>
+            </div>
+          </div>
+
+          <!-- Card 3: Aralash Mega Test -->
+          <div class="cat-card" onclick="startQuiz('all', 'all')">
+            <div>
+              <div class="cat-icon">⚡</div>
+              <h3>Aralash Mega Test</h3>
+              <p>Informatika va mantiqiy savollarning aralash to'plami. Reytingda maksimal ball to'plash uchun ajoyib imkoniyat!</p>
+            </div>
+            <div class="cat-footer">
+              <span>Barcha savollar</span>
+              <button class="cat-btn">Sinab ko'rish ➔</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quick filter by difficulty -->
+        <div style="text-align: center; margin-bottom: 3rem; background: var(--card-bg); border: 1px solid var(--card-border); padding: 1.5rem; border-radius: 16px;">
+          <h4 style="margin-bottom: 1rem; color: var(--text-secondary);">Qiyinlik darajasiga ko'ra darhol boshlash:</h4>
+          <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-secondary" onclick="startQuiz('all', 'oson')">🟢 Oson (10 ball)</button>
+            <button class="btn-secondary" onclick="startQuiz('all', 'orta')">🟡 O'rta (20 ball)</button>
+            <button class="btn-secondary" onclick="startQuiz('all', 'qiyin')">🔴 Qiyin (30 ball)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUIZ ACTIVE VIEW -->
+      <div id="quiz-view" class="quiz-panel hidden">
+        <div class="quiz-topbar">
+          <span id="quiz-cat-badge" class="quiz-badge">Kategoriya</span>
+          
+          <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div class="timer-box">
+              <span>⏳</span>
+              <span id="timer-seconds">30</span>s
+            </div>
+            <span id="question-counter" style="font-weight: 700; color: var(--text-muted);">1 / 10</span>
+            <button id="btn-exit-quiz" class="btn-secondary" style="padding: 0.35rem 0.8rem; font-size: 0.85rem;">Chiqish</button>
+          </div>
+        </div>
+
+        <div class="progress-bar-wrap">
+          <div id="quiz-progress" class="progress-bar-fill"></div>
+        </div>
+
+        <div id="quiz-question-text" class="quiz-question">Savol matni yuklanmoqda...</div>
+
+        <div id="quiz-options-container" class="options-grid">
+          <!-- Variantlar JS orqali joylanadi -->
+        </div>
+
+        <!-- Izoh (Explanation) -->
+        <div id="quiz-explanation" class="explanation-box hidden">
+          <h4 id="expl-title">To'g'ri javob!</h4>
+          <p id="expl-text">Bu yerda tushuntirish matni paydo bo'ladi.</p>
+        </div>
+
+        <div class="quiz-footer">
+          <div></div>
+          <button id="btn-next-question" class="btn-primary" disabled>
+            Keyingi savol ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- RESULTS VIEW -->
+      <div id="results-view" class="quiz-panel results-card hidden">
+        <div class="score-circle">
+          <span class="big-num" id="res-percent">+150</span>
+          <span class="sub">To'plangan ball</span>
+        </div>
+
+        <h2 id="res-status-msg" class="result-message">Tabriklaymiz!</h2>
+        <p style="color: var(--text-secondary);">Testdagi ishtirokingiz natijalari:</p>
+
+        <div class="results-stats">
+          <div class="res-stat">
+            <h5>To'g'ri javoblar</h5>
+            <span id="res-correct" style="color: var(--success);">8 ta</span>
+          </div>
+          <div class="res-stat">
+            <h5>Noto'g'ri javoblar</h5>
+            <span id="res-wrong" style="color: var(--error);">2 ta</span>
+          </div>
+          <div class="res-stat">
+            <h5>Aniqlik foizi</h5>
+            <span id="res-total">80%</span>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <button id="btn-restart-quiz" class="btn-primary">Qaytadan topshirish</button>
+          <button class="btn-secondary" onclick="switchTab('leaderboard')">🏆 Reytingni ko'rish</button>
+          <button id="btn-back-home" class="btn-secondary">Bosh sahifaga qaytish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: RIDDLES & LOGIC PUZZLES -->
+    <div id="section-riddles" class="view-section hidden">
+      <div class="filter-bar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="riddle-search" placeholder="Jumboq yoki mavzuni qidiring...">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <select id="riddle-filter-cat" class="filter-select">
+            <option value="all">Barcha toifalar</option>
+            <option value="mantiq">Faqat Mantiq</option>
+            <option value="informatika">Faqat IT / Kriptografiya</option>
+          </select>
+
+          <select id="riddle-filter-diff" class="filter-select">
+            <option value="all">Barcha darajalar</option>
+            <option value="oson">Oson</option>
+            <option value="orta">O'rta</option>
+            <option value="qiyin">Qiyin</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="riddles-container" class="riddle-list">
+        <!-- Jumboqlar dinamik yuklanadi -->
+      </div>
+    </div>
+
+    <!-- VIEW 3: LEADERBOARD (REYTING TIZIMI) -->
+    <div id="section-leaderboard" class="view-section hidden">
+      <div class="leaderboard-wrap">
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">🏆 Foydalanuvchilar Reytingi</h2>
+          <p style="color: var(--text-secondary);">Testlarni yeching, ballar to'plang va peshqadamlar qatoriga kiring!</p>
+        </div>
+
+        <!-- Foydalanuvchining o'z o'rni banneri -->
+        <div id="my-rank-banner-box" class="my-rank-banner hidden"></div>
+
+        <!-- TOP 3 PODIUM -->
+        <div id="leaderboard-podium" class="podium-grid"></div>
+
+        <!-- BARCHA FOYDALANUVCHILAR JADVALI -->
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">O'rin</th>
+                <th>Foydalanuvchi</th>
+                <th style="width: 130px;">Testlar soni</th>
+                <th style="width: 150px;">To'g'ri javoblar</th>
+                <th style="width: 140px;">Jami ball</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-table-body">
+              <!-- JS orqali to'ldiriladi -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: ADMIN PANEL -->
+    <div id="section-admin" class="view-section hidden">
+      <div class="admin-wrap">
+        <div class="admin-header-bar">
+          <div class="admin-title">
+            <h2>⚙️ Saytni Boshqarish Paneli</h2>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn-primary" id="btn-admin-add-q">➕ Yangi savol qo'shish</button>
+            <button class="btn-secondary" id="btn-admin-change-pass" title="Admin parolini o'zgartirish">🔑 Parol</button>
+            <button class="btn-secondary" id="btn-admin-export" title="JSON formatda yuklab olish">📤 JSON Eksport</button>
+            <button class="btn-secondary" id="btn-admin-reset" title="Standart savollarga qaytarish">🔄 Reset</button>
+            <button class="btn-secondary" id="btn-admin-logout" style="color: var(--error);" title="Paneldan chiqish">🚪 Chiqish</button>
+          </div>
+        </div>
+
+        <!-- Admin Subtabs: Savollar va Foydalanuvchilar -->
+        <div class="admin-subtabs">
+          <button class="admin-subtab-btn active" data-subtab="questions">📋 Savollar Bazasi (<span id="admin-total-badge">0</span>)</button>
+          <button class="admin-subtab-btn" data-subtab="users">👥 Ro'yxatdan O'tgan Odamlar (<span id="admin-users-total-badge">0</span>)</button>
+        </div>
+
+        <!-- TAB 1: SAVOLLARNI BOSHQARISH -->
+        <div id="admin-subtab-questions" class="admin-subtab-content">
+          <div class="admin-controls-row">
+            <div class="search-box" style="flex: 1; max-width: 320px;">
+              <span>🔍</span>
+              <input type="text" id="admin-search-input" placeholder="Savollarni qidirish...">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <select id="admin-filter-cat" class="filter-select">
+                <option value="all">Barcha fanlar</option>
+                <option value="informatika">💻 Informatika</option>
+                <option value="mantiq">🧠 Mantiq</option>
+              </select>
+
+              <select id="admin-filter-type" class="filter-select">
+                <option value="all">Barcha turlar</option>
+                <option value="quiz">🎯 Test (Quiz)</option>
+                <option value="riddle">🧩 Jumboq (Riddle)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">ID</th>
+                  <th style="width: 110px;">Toifa</th>
+                  <th style="width: 110px;">Turi</th>
+                  <th>Savol va Yechim</th>
+                  <th style="width: 90px;">Daraja</th>
+                  <th style="width: 180px;">Amallar</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body">
+                <!-- JS orqali to'ldiriladi -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: FOYDALANUVCHILARNI KO'RISH VA BOSHQARISH -->
+        <div id="admin-subtab-users" class="admin-subtab-content hidden">
+          <div class="admin-controls-row">
+            <div class="search-box" style="flex: 1; max-width: 360px;">
+              <span>🔍</span>
+              <input type="text" id="admin-users-search" placeholder="Ism, telefon yoki email qidirish...">
+            </div>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Reyting</th>
+                  <th>Ism va Foydalanuvchi</th>
+                  <th>Telefon Raqami</th>
+                  <th>Google Hisobi / Email</th>
+                  <th>To'plagan Balli</th>
+                  <th>Testlar soni</th>
+                  <th style="width: 100px;">Amal</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body">
+                <!-- JS orqali to'ldiriladi -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 5: TOURNAMENT -->
+    <div id="section-tournament" class="view-section hidden">
+
+      <!-- TOURNAMENT INTRO -->
+      <div id="tournament-intro-view">
+        <div class="tournament-hero">
+          <div class="tournament-hero-icon">⚡</div>
+          <h2 class="tournament-hero-title">Musobaqa Rejimi</h2>
+          <p class="tournament-hero-desc">3 daqiqa ichida imkon qadar ko'p to'g'ri javob bering! Ketma-ket to'g'ri javoblar uchun <strong>Streak Bonuslari</strong> qo'shiladi. Faqat eng yuqori natijangiz reytingga kiradi!</p>
+
+          <div class="tournament-rules">
+            <div class="trule-card">
+              <div class="trule-icon">⏱️</div>
+              <div class="trule-title">3 daqiqa</div>
+              <div class="trule-desc">Butun musobaqa vaqti</div>
+            </div>
+            <div class="trule-card">
+              <div class="trule-icon">🔥</div>
+              <div class="trule-title">Streak x2</div>
+              <div class="trule-desc">5+ ketma-ket to'g'ri</div>
+            </div>
+            <div class="trule-card">
+              <div class="trule-icon">⚡</div>
+              <div class="trule-title">Tez javob</div>
+              <div class="trule-desc">10 soniyada +50% bonus</div>
+            </div>
+            <div class="trule-card">
+              <div class="trule-icon">🏆</div>
+              <div class="trule-title">Top 10</div>
+              <div class="trule-desc">Musobaqa reytingi</div>
+            </div>
+          </div>
+
+          <div class="tournament-difficulty-select">
+            <h4>Qiyinlik darajasi:</h4>
+            <div class="tdiff-buttons">
+              <button class="tdiff-btn active" data-diff="all" onclick="selectTournamentDiff(this, 'all')">🌟 Aralash</button>
+              <button class="tdiff-btn" data-diff="oson" onclick="selectTournamentDiff(this, 'oson')">🟢 Oson</button>
+              <button class="tdiff-btn" data-diff="orta" onclick="selectTournamentDiff(this, 'orta')">🟡 O'rta</button>
+              <button class="tdiff-btn" data-diff="qiyin" onclick="selectTournamentDiff(this, 'qiyin')">🔴 Qiyin</button>
+            </div>
+          </div>
+
+          <button class="btn-primary tournament-start-btn" id="btn-start-tournament" onclick="startTournament()">
+            ⚡ Musobaqani Boshlash!
+          </button>
+
+          <!-- Tournament Leaderboard -->
+          <div class="t-leaderboard-section">
+            <h3>🏆 Musobaqa Reytingi (Top 10)</h3>
+            <div id="tournament-leaderboard-container">
+              <!-- JS orqali to'ldiriladi -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOURNAMENT QUIZ VIEW -->
+      <div id="tournament-quiz-view" class="hidden">
+        <!-- Top bar -->
+        <div class="tournament-topbar">
+          <div class="t-info-left">
+            <span class="quiz-badge" id="t-cat-badge">⚡ Musobaqa</span>
+            <span class="t-question-num" id="t-question-num">1 / ?</span>
+          </div>
+          <div class="t-timer-wrap">
+            <div class="t-timer-ring">
+              <svg width="70" height="70" viewBox="0 0 70 70">
+                <circle cx="35" cy="35" r="30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5"/>
+                <circle id="t-timer-circle" cx="35" cy="35" r="30" fill="none" stroke="var(--accent)" stroke-width="5"
+                  stroke-dasharray="188.5" stroke-dashoffset="0" stroke-linecap="round"
+                  transform="rotate(-90 35 35)" style="transition: stroke-dashoffset 1s linear, stroke 0.3s;"/>
+              </svg>
+              <span class="t-timer-text" id="t-timer-seconds">3:00</span>
+            </div>
+          </div>
+          <div class="t-info-right">
+            <div class="t-score-display">
+              <span class="t-score-label">Ball:</span>
+              <span class="t-score-val" id="t-score-val">0</span>
+            </div>
+            <div class="t-streak-display" id="t-streak-display">
+              🔥 <span id="t-streak-count">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="quiz-progress-track" style="margin: 0.5rem 0 1.2rem;">
+          <div class="quiz-progress-bar" id="t-progress-bar" style="width: 100%; background: var(--accent);"></div>
+        </div>
+
+        <!-- Streak Bonus Notification -->
+        <div id="t-streak-popup" class="t-streak-popup hidden"></div>
+
+        <!-- Question Card -->
+        <div class="quiz-question-card">
+          <div class="t-pts-badge" id="t-pts-badge">+10</div>
+          <div class="quiz-q-text" id="t-question-text">Savol yuklanmoqda...</div>
+        </div>
+
+        <!-- Options -->
+        <div class="quiz-options-grid" id="t-options-container"></div>
+
+        <!-- Explanation -->
+        <div id="t-explanation" class="explanation-box hidden">
+          <div class="expl-status" id="t-expl-title">To'g'ri!</div>
+          <div class="expl-text" id="t-expl-text"></div>
+          <button class="btn-primary" id="t-btn-next" onclick="nextTournamentQuestion()" style="margin-top: 1rem; width: 100%; justify-content: center;">Keyingi ➔</button>
+        </div>
+      </div>
+
+      <!-- TOURNAMENT RESULTS -->
+      <div id="tournament-results-view" class="hidden">
+        <div class="t-results-card">
+          <div class="t-medal-wrap" id="t-medal-wrap">🥇</div>
+          <h2 class="t-results-title">Musobaqa Tugadi!</h2>
+          <div class="t-results-subtitle" id="t-results-subtitle">Ajoyib natija!</div>
+
+          <div class="t-results-grid">
+            <div class="t-res-stat">
+              <div class="t-res-num" id="t-res-score">0</div>
+              <div class="t-res-label">Ball</div>
+            </div>
+            <div class="t-res-stat">
+              <div class="t-res-num" id="t-res-correct">0</div>
+              <div class="t-res-label">To'g'ri javob</div>
+            </div>
+            <div class="t-res-stat">
+              <div class="t-res-num" id="t-res-streak">0</div>
+              <div class="t-res-label">Max Streak</div>
+            </div>
+            <div class="t-res-stat">
+              <div class="t-res-num" id="t-res-rank">#-</div>
+              <div class="t-res-label">Reytingdagi o'rin</div>
+            </div>
+          </div>
+
+          <div class="t-new-record-banner hidden" id="t-new-record-banner">
+            🎉 Yangi shaxsiy rekord!
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+            <button class="btn-primary" id="btn-t-replay" onclick="startTournament()" style="justify-content: center;">⚡ Qaytadan</button>
+            <button class="btn-secondary" onclick="exitTournament()" style="justify-content: center;">🏠 Bosh sahifaga</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CREATOR & DEVELOPER / MAS'UL SHAXS SECTION -->
+    <section class="creator-section" id="section-creator">
+      <div class="creator-card">
+        <div class="creator-avatar-wrap">
+          <img src="author.jpg" alt="Loyiha Dasturchisi Muhammaddiyor" class="creator-avatar-img">
+          <div class="creator-status-badge">
+            <span class="creator-status-dot"></span>
+            Loyiha Yaratuvchisi
+          </div>
+        </div>
+
+        <div class="creator-info">
+          <div class="creator-top-badge">
+            <span>⚡ Mas'ul Shaxs & Asoschi</span>
+          </div>
+          <h2 class="creator-name">Muhammaddiyor</h2>
+          <div class="creator-role">
+            <span>💻</span> Full-Stack Dasturchi & Loyiha Muallifi
+          </div>
+          <p class="creator-desc">
+            Ushbu <strong>InfoLogik</strong> platformasi yoshlarning informatika, zamonaviy dasturlash va mantiqiy tafakkurini yuksaltirish uchun maxsus ishlab chiqilgan. Sayt ishlashi, yangi savollar kiritish, hamkorlik yoki takliflar bo'yicha bevosita men bilan bog'lanishingiz mumkin.
+          </p>
+
+          <div class="creator-contacts">
+            <a href="https://t.me/DevelopperMuhammad" target="_blank" class="creator-contact-pill creator-btn-telegram" title="Telegram shaxsiy profil: @DevelopperMuhammad">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+              </svg>
+              <span>@DevelopperMuhammad</span>
+            </a>
+            <a href="https://t.me/dasturchilar_uchun_foydali" target="_blank" class="creator-contact-pill" title="Telegram kanalimiz: @dasturchilar_uchun_foydali" style="background: rgba(0, 136, 204, 0.12); border-color: rgba(0, 136, 204, 0.35); color: #38bdf8;">
+              <span>📢</span>
+              <span>Telegram Kanalimiz</span>
+            </a>
+            <a href="tel:+998889810206" class="creator-contact-pill" title="Qo'ng'iroq qilish: +998 88 981 02 06">
+              <span>📞</span>
+              <span>+998 88 981 02 06</span>
+            </a>
+            <span class="creator-contact-pill" style="opacity: 0.85; cursor: default;" title="Tizim himoyasi">
+              <span>🛡️</span>
+              <span>Sayt xavfsizligi va nazorati</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- USER & ADMIN AUTH MODAL (RO'YXATDAN O'TISH / KIRISH) -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 470px;">
+      <div class="modal-header">
+        <h3 style="font-size: 1.3rem;" id="auth-modal-title">Tizimga kirish</h3>
+        <button class="btn-icon" id="btn-close-auth-modal" style="width: 32px; height: 32px;">✕</button>
+      </div>
+
+      <!-- ROLE SWITCHER TABS -->
+      <div class="auth-role-tabs">
+        <button type="button" class="auth-role-btn active" id="tab-auth-user" onclick="switchAuthMode('user')">
+          👤 Foydalanuvchi
+        </button>
+        <button type="button" class="auth-role-btn" id="tab-auth-admin" onclick="switchAuthMode('admin')">
+          🔐 Admin Kirish
+        </button>
+      </div>
+
+      <!-- PANEL 1: REGULAR USER REGISTRATION & LOGIN -->
+      <div id="auth-panel-user">
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.2rem;">
+          Ma'lumotlaringiz sizni eslab qolish, test ballaringizni saqlash va umumiy reytingda qatnashishingiz uchun ishlatiladi.
+        </p>
+
+        <!-- Google Sign-in Button -->
+        <button type="button" class="btn-google" id="btn-google-signin">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Google orqali tezkor kirish</span>
+        </button>
+
+        <div class="divider-or">yoki quyidagilarni to'ldiring</div>
+
+        <!-- Registration Form -->
+        <form id="auth-form">
+          <div class="form-group">
+            <label>Ismingiz *</label>
+            <input type="text" id="auth-name" class="form-control" placeholder="Masalan: Sardor" required>
+          </div>
+
+          <div class="form-group">
+            <label>Telefon raqamingiz *</label>
+            <input type="tel" id="auth-phone" class="form-control" placeholder="+998 90 123 45 67" required>
+          </div>
+
+          <div class="form-group">
+            <label>Google akkaunt / Email (ixtiyoriy)</label>
+            <input type="email" id="auth-email" class="form-control" placeholder="example@gmail.com">
+          </div>
+
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+            Saqlash va Kirish ➔
+          </button>
+        </form>
+      </div>
+
+      <!-- PANEL 2: ADMIN DEDICATED LOGIN -->
+      <div id="auth-panel-admin" class="hidden">
+        <div style="text-align: center; margin-bottom: 1.25rem;">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔐</div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            Tizimni to'liq boshqarish, savollar bazasini tahrirlash va barcha foydalanuvchilar ma'lumotlarini ko'rish uchun maxsus boshqaruvchi parolini kiriting.
+          </p>
+        </div>
+
+        <form id="auth-admin-form">
+          <div class="form-group">
+            <label>Admin ismi *</label>
+            <input type="text" id="auth-admin-name" class="form-control" placeholder="Ismingizni kiriting..." required>
+          </div>
+
+          <div class="form-group">
+            <label>Admin telefon raqami *</label>
+            <input type="tel" id="auth-admin-phone" class="form-control" placeholder="+998 90 123 45 67" required>
+          </div>
+
+          <div class="form-group">
+            <label>Admin maxfiy paroli *</label>
+            <input type="password" id="auth-admin-password" class="form-control" placeholder="Maxfiy parolni kiriting..." required autocomplete="current-password">
+          </div>
+
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.2rem; background: linear-gradient(135deg, #f59e0b, #ef4444); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
+            🔐 Admin sifatida kirish ➔
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- USER PROFILE MODAL -->
+  <div id="profile-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 style="font-size: 1.3rem;">Foydalanuvchi Profili</h3>
+        <button class="btn-icon" id="btn-close-profile-modal" style="width: 32px; height: 32px;">✕</button>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <!-- Profil rasmi — bosib o'zgartirish mumkin -->
+        <div id="profile-avatar-wrap" onclick="document.getElementById('avatar-file-input').click()"
+          style="position: relative; width: 80px; height: 80px; margin: 0 auto 0.75rem; cursor: pointer;">
+          <div id="profile-avatar-circle" class="user-avatar-circle"
+            style="width: 80px; height: 80px; font-size: 2rem; overflow: hidden; padding: 0;">
+            <span id="profile-avatar-emoji">👤</span>
+            <img id="profile-avatar-img" src="" alt="Profil rasmi"
+              style="display:none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+          </div>
+          <!-- Kamera ikonkasi (hover da ko'rinadi) -->
+          <div style="position: absolute; bottom: 0; right: 0; background: var(--primary);
+            border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center;
+            justify-content: center; font-size: 0.75rem; border: 2px solid var(--bg-base);">
+            📷
+          </div>
+        </div>
+        <!-- Yashirin fayl input -->
+        <input type="file" id="avatar-file-input" accept="image/*" style="display:none;"
+          onchange="handleAvatarUpload(event)">
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.3rem; margin-bottom: 0.6rem;">
+          📷 Rasmga bosib o'zgartiring
+        </p>
+        <h2 id="profile-view-name" style="font-size: 1.4rem; font-weight: 800;">Foydalanuvchi</h2>
+      </div>
+
+      <!-- Telefon va email faqat adminlar ko'radi - bu yerda yashirin -->
+      <span id="profile-view-phone" style="display:none;"></span>
+      <span id="profile-view-email" style="display:none;"></span>
+      <span id="profile-view-date" style="display:none;"></span>
+
+      <div class="profile-stat-grid">
+        <div class="profile-stat-box">
+          <div class="stat-val" id="profile-stat-tests">0</div>
+          <div class="stat-lbl">Testlar soni</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="stat-val" id="profile-stat-best">0 ball</div>
+          <div class="stat-lbl">Jami ball</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="stat-val" id="profile-stat-correct">-</div>
+          <div class="stat-lbl">Reytingdagi o'rin</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn-secondary" onclick="openAuthModal(); closeProfileModal();" style="flex: 1;">
+          ✏️ Tahrirlash
+        </button>
+        <button type="button" class="btn-secondary" id="btn-profile-logout" style="flex: 1; color: var(--error);">
+          🚪 Chiqish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT QUESTION MODAL -->
+  <div id="question-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title" style="font-size: 1.25rem;">Yangi savol qo'shish</h3>
+        <button class="btn-icon" id="btn-close-modal" style="width: 32px; height: 32px;">✕</button>
+      </div>
+
+      <form id="question-form">
+        <input type="hidden" id="editing-id" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Savol turi</label>
+            <select id="form-type" class="form-control" required>
+              <option value="quiz">🎯 Test (Ko'p tanlovli)</option>
+              <option value="riddle">🧩 Mantiqiy Jumboq (Ochiq javobli)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Kategoriya</label>
+            <select id="form-cat" class="form-control" required>
+              <option value="informatika">💻 Informatika</option>
+              <option value="mantiq">🧠 Mantiq</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Qiyinlik darajasi (Standart ball)</label>
+            <select id="form-diff" class="form-control" required>
+              <option value="oson">🟢 Oson (+10 ball)</option>
+              <option value="orta" selected>🟡 O'rta (+20 ball)</option>
+              <option value="qiyin">🔴 Qiyin (+30 ball)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mavzu / Subkategoriya</label>
+            <input type="text" id="form-subcat" class="form-control" placeholder="Masalan: Python, Algoritm, Deduksiya" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Savol matni</label>
+          <textarea id="form-question-text" class="form-control" rows="3" placeholder="Savolni batafsil kiriting..." required></textarea>
+        </div>
+
+        <!-- QUIZ SPECIFIC FIELDS -->
+        <div id="quiz-specific-fields">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Variant A</label>
+              <input type="text" id="form-opt-0" class="form-control" placeholder="A varianti">
+            </div>
+            <div class="form-group">
+              <label>Variant B</label>
+              <input type="text" id="form-opt-1" class="form-control" placeholder="B varianti">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Variant C</label>
+              <input type="text" id="form-opt-2" class="form-control" placeholder="C varianti">
+            </div>
+            <div class="form-group">
+              <label>Variant D</label>
+              <input type="text" id="form-opt-3" class="form-control" placeholder="D varianti">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>To'g'ri javob varianti</label>
+            <select id="form-correct-idx" class="form-control">
+              <option value="0">Variant A</option>
+              <option value="1">Variant B</option>
+              <option value="2">Variant C</option>
+              <option value="3">Variant D</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>To'g'ri javob izohi / Tushuntirish</label>
+            <textarea id="form-explanation" class="form-control" rows="2" placeholder="Foydalanuvchiga to'g'ri javob sababini tushuntiring..."></textarea>
+          </div>
+        </div>
+
+        <!-- RIDDLE SPECIFIC FIELDS -->
+        <div id="riddle-specific-fields" class="hidden">
+          <div class="form-group">
+            <label>Maslahat (Hint - ixtiyoriy)</label>
+            <input type="text" id="form-hint" class="form-control" placeholder="Topishga yordam beruvchi kichik maslahat...">
+          </div>
+          <div class="form-group">
+            <label>To'g'ri yechim va javob</label>
+            <textarea id="form-riddle-ans" class="form-control" rows="3" placeholder="Jumboqning to'liq yechimi va javobini yozing..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+          💾 Saqlash
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="admin-login-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 420px; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔐</div>
+      <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Admin Kirish</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Savollarni qo'shish, o'chirish va foydalanuvchilarni ko'rish uchun parolni kiriting.
+      </p>
+
+      <form id="admin-login-form">
+        <div class="form-group" style="text-align: left;">
+          <label>Admin paroli</label>
+          <input type="password" id="admin-password-input" class="form-control" placeholder="Parolni kiriting..." required>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn-secondary" id="btn-close-login-modal" style="flex: 1;">Bekor qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1; justify-content: center;">Kirish ➔</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <p>© InfoLogik — Informatika va Mantiqiy Savollar Portali. Barcha huquqlar himoyalangan.</p>
+      <p style="font-size: 0.9rem; color: var(--text-secondary);">
+        Loyiha muallifi: <strong style="color: var(--primary); cursor: pointer;" onclick="scrollToAuthor()">👨‍💻 Muhammaddiyor</strong>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/questions.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
